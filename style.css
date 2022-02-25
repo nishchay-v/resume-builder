@@ -1,0 +1,135 @@
+* {
+    font-family: Helvetica, sans-serif;
+    font-size: small;
+}
+[href] {
+    color: lightseagreen;
+}
+.container {
+    display: flex;
+}
+.form {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+#preview {
+    display: flex;
+    flex-direction: column;
+    border-left: 2px dashed gray;
+}
+ul {
+    list-style: none;
+}
+ul li {
+    display: block;
+}
+
+textarea {
+    display: block;
+}
+
+button {
+    display: inline;
+}
+form {
+    display: inline;
+}
+#editor {
+    flex: 0 0 50%;
+}
+.collapsible {
+    display: flex;
+    justify-content: space-between;
+}
+.section-heading {
+    color: white;
+    background-color: dodgerblue;
+    padding: 4px 12px 4px 12px;
+    margin: 6px 8px 6px 8px;
+}
+button.section-heading {
+    width: 95%;
+    text-align: left;
+}
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 16px 8px 16px 8px;
+    padding: 4px 8px 4px 8px;
+    height: 7rem;
+}
+.btn {
+    margin-top: 16px;
+}
+.remove-button {
+    padding: 0px;
+    align-self: flex-end;
+}
+
+.list-info {
+    line-height: 1.2rem;
+}
+
+/* for project title */
+#projects .bold {
+    margin-bottom: 2rem;
+}
+#name {
+    font-size: medium;
+    color: dodgerblue;
+    font-weight: bolder;
+}
+
+.h_list li {
+    display: inline;
+}
+.actions {
+    display: flex;
+}
+.input-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+input {
+    margin: 8px;
+}
+.input-field input {
+    width: 20rem;
+}
+.small-input-field {
+    width: 5rem;
+}
+.list-field {
+    display: flex;
+    flex-direction: column;
+}
+.boxed {
+    padding: 4px 12px 4px 12px;
+    margin: 6px 8px 6px 8px;
+    border: 2px solid gainsboro;
+}
+.bubble {
+    background-color: gainsboro;
+    margin: 16px 4px;
+    padding: 4px;
+    border-radius: 25px;
+}
+.add-bubble {
+    display: inline-block;
+}
+.element {
+    display: inline-block;
+    width: 45%;
+}
+.h_list {
+    margin: 4px;
+    list-style: none;
+    display: inline;
+}
+.bold {
+    font-weight: bold;
+}

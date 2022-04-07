@@ -94,6 +94,14 @@ The app was built from scratch by me using MVVM architecture and uses the latest
     ],
 };
 
+const sectionNames = {
+    skills: "KEY EXPERTISE/SKILLS",
+    education: "EDUCATION",
+    projects: "PROJECTS",
+    interests: "PERSONAL INTERESTS/HOBBIES",
+    details: "PERSONAL DETAILS",
+};
+
 const dataFields = {
     education: ["institute", "affiliation", "score"],
     projects: ["title", "description", "link", "keySkills"],
@@ -110,6 +118,12 @@ const dataFields = {
         "emailId",
     ],
 };
+
+function getElementIdHelper(event) {
+    const ElementId = event.target.parentElement.id;
+    const id = parseInt(ElementId.slice(-1)) || 1;
+    return id;
+}
 
 class Model {
     addSubsection(updatedData) {
@@ -149,10 +163,17 @@ class View {
             this.inputList = this.createElement("ul");
             this.inputList.id = "input-list-" + section;
 
-            this.addButton = this.createElement("button", "add-button");
-            this.addButton.textContent = "Add";
+            const addButton = this.createElement("button", "add-button");
+            addButton.textContent = "Add";
 
-            this.editor.append(this.inputList, this.addButton);
+            this.buttons = {
+                add: addButton,
+                delete: [],
+                submit: [],
+                reset: [],
+            };
+
+            this.editor.append(this.inputList, addButton);
 
             this.contentList = this.createElement("ul", "list-" + section);
             this.preview.append(this.contentList);
@@ -201,31 +222,38 @@ class View {
         return inputFields;
     }
 
-    bindActions(addHandler, deleteHandler, submitHandler, resetHandler) {
-        this.editor.addEventListener("click", (event) => {
-            const ElementId = event.target.parentElement.id;
-            const id =
-                parseInt(
-                    ElementId.replace("input-data-" + this.section + "-", "")
-                ) || 1;
-            switch (event.target.className) {
-                case "add-button":
-                    addHandler();
-                    break;
-                case "delete-button":
-                    deleteHandler(id);
-                    break;
-                case "submit-button":
-                    const updatedData = this.getInputValues(id);
-                    submitHandler(id, updatedData);
-                    break;
-                case "reset-button":
-                    resetHandler(id);
-                    break;
-                default:
-                    break;
-            }
+    bindActions(
+        addHandler,
+        deleteHandler,
+        submitHandler,
+        resetHandler,
+        buttons
+    ) {
+        buttons.add.addEventListener("click", () => {
+            addHandler();
         });
+
+        buttons.submit.forEach((button) =>
+            button.addEventListener("click", (event) => {
+                const id = getElementIdHelper(event);
+                const updatedData = this.getInputValues(id);
+                submitHandler(id, updatedData);
+            })
+        );
+
+        buttons.delete.forEach((button) =>
+            button.addEventListener("click", (event) => {
+                const id = getElementIdHelper(event);
+                deleteHandler(id);
+            })
+        );
+
+        buttons.reset.forEach((button) =>
+            button.addEventListener("click", (event) => {
+                const id = getElementIdHelper(event);
+                resetHandler(id);
+            })
+        );
     }
 }
 
@@ -233,19 +261,20 @@ class Controller {
     constructor(model, view) {
         this.model = model;
         this.view = view;
-
-        this.view.bindActions(
-            this.handleAddSubsection,
-            this.handleDelete,
-            this.handleSubmit,
-            this.handleReset
-        );
         this.model.bindOnListChanged(this.onListChanged);
         this.onListChanged(this.model.data);
     }
     onListChanged = (data) => {
         this.view.displayContents(this.model.data);
         this.view.displayInputs(data);
+
+        this.view.bindActions(
+            this.handleAddSubsection,
+            this.handleDelete,
+            this.handleSubmit,
+            this.handleReset,
+            this.view.buttons
+        );
     };
     handleDelete = (id) => {
         this.model.deleteSubsection(id);
@@ -316,6 +345,9 @@ class EducationView extends View {
         while (this.inputList.firstChild) {
             this.inputList.removeChild(this.inputList.firstChild);
         }
+        this.buttons.submit = [];
+        this.buttons.delete = [];
+        this.buttons.reset = [];
 
         data.forEach((sub) => {
             const li = this.createElement("li");
@@ -327,13 +359,15 @@ class EducationView extends View {
 
             const submitButton = this.createElement("button", "submit-button");
             submitButton.textContent = "Submit";
+            this.buttons.submit.push(submitButton);
 
             const resetButton = this.createElement("button", "reset-button");
             resetButton.textContent = "Reset";
+            this.buttons.reset.push(resetButton);
 
             const deleteButton = this.createElement("button", "delete-button");
-
             deleteButton.textContent = "X";
+            this.buttons.delete.push(deleteButton);
 
             form.append(...inputFields);
 
@@ -381,6 +415,9 @@ class ProjectsView extends View {
         while (this.inputList.firstChild) {
             this.inputList.removeChild(this.inputList.firstChild);
         }
+        this.buttons.submit = [];
+        this.buttons.delete = [];
+        this.buttons.reset = [];
 
         data.forEach((sub) => {
             const li = this.createElement("li");
@@ -390,13 +427,15 @@ class ProjectsView extends View {
 
             const submitButton = this.createElement("button", "submit-button");
             submitButton.textContent = "Submit";
+            this.buttons.submit.push(submitButton);
 
             const resetButton = this.createElement("button", "reset-button");
             resetButton.textContent = "Reset";
+            this.buttons.reset.push(resetButton);
 
             const deleteButton = this.createElement("button", "delete-button");
-
             deleteButton.textContent = "X";
+            this.buttons.delete.push(deleteButton);
 
             const inputFields = this.createInputFields(sub);
 
@@ -451,6 +490,9 @@ class InterestsView extends View {
         while (this.inputList.firstChild) {
             this.inputList.removeChild(this.inputList.firstChild);
         }
+        this.buttons.submit = [];
+        this.buttons.delete = [];
+        this.buttons.reset = [];
 
         data.forEach((sub) => {
             const li = this.createElement("li");
@@ -462,13 +504,15 @@ class InterestsView extends View {
 
             const submitButton = this.createElement("button", "submit-button");
             submitButton.textContent = "Submit";
+            this.buttons.submit.push(submitButton);
 
             const resetButton = this.createElement("button", "reset-button");
             resetButton.textContent = "Reset";
+            this.buttons.reset.push(resetButton);
 
             const deleteButton = this.createElement("button", "delete-button");
-
             deleteButton.textContent = "X";
+            this.buttons.delete.push(deleteButton);
 
             form.append(...inputFields);
 
@@ -511,6 +555,9 @@ class SkillsView extends View {
         while (this.inputList.firstChild) {
             this.inputList.removeChild(this.inputList.firstChild);
         }
+        this.buttons.submit = [];
+        this.buttons.delete = [];
+        this.buttons.reset = [];
 
         data.forEach((sub) => {
             const li = this.createElement("li", "bubble");
@@ -523,12 +570,15 @@ class SkillsView extends View {
 
             const submitButton = this.createElement("button", "submit-button");
             submitButton.textContent = "Submit";
+            this.buttons.submit.push(submitButton);
 
             const resetButton = this.createElement("button", "reset-button");
             resetButton.textContent = "Reset";
+            this.buttons.reset.push(resetButton);
 
             const deleteButton = this.createElement("button", "delete-button");
             deleteButton.textContent = "X";
+            this.buttons.delete.push(deleteButton);
 
             li.append(inputSkill, submitButton, resetButton, deleteButton);
             this.inputList.append(li);
@@ -551,7 +601,7 @@ class SkillsView extends View {
 class InfoView extends View {
     constructor() {
         super("info");
-        this.addButton.style.display = "none";
+        this.buttons.add.style.display = "none";
     }
 
     displayInputs(data) {
@@ -565,9 +615,11 @@ class InfoView extends View {
 
         const submitButton = this.createElement("button", "submit-button");
         submitButton.textContent = "Submit";
+        this.buttons.submit.push(submitButton);
 
         const resetButton = this.createElement("button", "reset-button");
         resetButton.textContent = "Reset";
+        this.buttons.reset.push(resetButton);
 
         form.append(...inputFields);
         li.append(form, submitButton, resetButton);
@@ -607,7 +659,7 @@ class InfoView extends View {
 class DetailsView extends View {
     constructor() {
         super("details");
-        this.addButton.style.display = "none";
+        this.buttons.add.style.display = "none";
         this.preview.classList.add("boxed");
     }
 
@@ -622,9 +674,11 @@ class DetailsView extends View {
 
         const submitButton = this.createElement("button", "submit-button");
         submitButton.textContent = "Submit";
+        this.buttons.submit.push(submitButton);
 
         const resetButton = this.createElement("button");
         resetButton.textContent = "Reset";
+        this.buttons.reset.push(resetButton);
 
         form.append(...inputFields);
         li.append(form, submitButton, resetButton);
@@ -755,14 +809,6 @@ class DetailsController extends Controller {
         super(model, view);
     }
 }
-
-const sectionNames = {
-    skills: "KEY EXPERTISE/SKILLS",
-    education: "EDUCATION",
-    projects: "PROJECTS",
-    interests: "PERSONAL INTERESTS/HOBBIES",
-    details: "PERSONAL DETAILS",
-};
 
 class PreviewView extends View {
     constructor() {
